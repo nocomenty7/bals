@@ -77,7 +77,7 @@ export default function ShareSheet({ onClose, shareUrl, questionTitle }: ShareSh
           content: {
             title: 'UPick - 당신의 선택은?',
             description: questionTitle,
-            imageUrl: `${window.location.origin}/logo.png`,
+            imageUrl: `${window.location.origin}/logo.png?v=2`,
             link: {
               mobileWebUrl: shareUrl,
               webUrl: shareUrl,
