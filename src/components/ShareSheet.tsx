@@ -34,16 +34,22 @@ export default function ShareSheet({ onClose, shareUrl, questionTitle }: ShareSh
         // Enforce temp visible properties for clean rendering
         html2canvas(element, {
           useCORS: true,
+          allowTaint: false,
           backgroundColor: '#09090b', // Zinc-950 theme background
-          scale: 3, // 3x high resolution for retina displays and crisp text
+          scale: 2, // 2x scale: stable, highly performant on mobile, and sharp
           logging: false,
-          allowTaint: true,
+          width: element.clientWidth,
+          height: element.clientHeight,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: document.documentElement.clientWidth,
+          windowHeight: document.documentElement.clientHeight,
         })
           .then((canvas) => {
             const dataUrl = canvas.toDataURL('image/png');
             const link = document.createElement('a');
             link.href = dataUrl;
-            link.download = `UPICK-game-result.png`;
+            link.download = `UPick-game-result.png`;
             link.click();
           })
           .catch((err) => {
@@ -69,9 +75,9 @@ export default function ShareSheet({ onClose, shareUrl, questionTitle }: ShareSh
         window.Kakao.Share.sendDefault({
           objectType: 'feed',
           content: {
-            title: 'UPICK - 모두의 밸런스게임',
+            title: 'UPick - 당신의 선택은?',
             description: questionTitle,
-            imageUrl: `${window.location.origin}/logo.jpg`,
+            imageUrl: `${window.location.origin}/logo.png`,
             link: {
               mobileWebUrl: shareUrl,
               webUrl: shareUrl,
@@ -130,7 +136,7 @@ export default function ShareSheet({ onClose, shareUrl, questionTitle }: ShareSh
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-        className="relative z-10 w-full max-w-md rounded-t-3xl bg-neutral-900/98 border-t border-neutral-800 p-6 text-white shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden max-h-[70dvh]"
+        className="relative z-10 w-full max-w-md rounded-t-3xl bg-neutral-900/98 border-t border-neutral-800 p-6 text-white shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden max-h-[75dvh]"
       >
         <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-neutral-700 cursor-pointer shrink-0" onClick={onClose} />
 
@@ -146,25 +152,6 @@ export default function ShareSheet({ onClose, shareUrl, questionTitle }: ShareSh
 
         {/* Buttons List */}
         <div className="space-y-3 pb-6 flex-1 overflow-y-auto min-h-0 pr-1">
-          {/* Capture Image Button */}
-          <button
-            onClick={handleCaptureImage}
-            disabled={capturing}
-            className="flex w-full items-center gap-3 rounded-2xl bg-zinc-800 border border-zinc-750 hover:bg-zinc-750 text-neutral-200 font-extrabold p-4 transition-all shadow-md text-sm disabled:opacity-50"
-          >
-            {capturing ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
-                <span>이미지 파일 생성 중...</span>
-              </>
-            ) : (
-              <>
-                <ImageIcon className="h-5 w-5 text-neutral-300" />
-                <span>결과 화면 이미지로 저장하기</span>
-              </>
-            )}
-          </button>
-
           {/* Kakao Talk button */}
           <button
             onClick={handleKakaoShare}
@@ -196,6 +183,25 @@ export default function ShareSheet({ onClose, shareUrl, questionTitle }: ShareSh
               <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
             </svg>
             <span>인스타그램 스토리에 공유</span>
+          </button>
+
+          {/* Capture Image Button (Moved below Instagram Share) */}
+          <button
+            onClick={handleCaptureImage}
+            disabled={capturing}
+            className="flex w-full items-center gap-3 rounded-2xl bg-zinc-800 border border-zinc-750 hover:bg-zinc-750 text-neutral-200 font-extrabold p-4 transition-all shadow-md text-sm disabled:opacity-50"
+          >
+            {capturing ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
+                <span>이미지 파일 생성 중...</span>
+              </>
+            ) : (
+              <>
+                <ImageIcon className="h-5 w-5 text-neutral-300" />
+                <span>결과 화면 이미지로 저장하기</span>
+              </>
+            )}
           </button>
 
           {/* Copy URL button */}

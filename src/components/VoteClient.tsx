@@ -198,7 +198,7 @@ export default function VoteClient({
             </div>
             <h2 className="text-2xl font-black mb-4">대단해요! 정복 완료 🎉</h2>
             <p className="text-sm text-zinc-400 leading-relaxed whitespace-pre-line mb-8">
-              UPICK의 모든 질문에 답변하셨습니다!{"\n"}
+              UPick의 모든 질문에 답변하셨습니다!{"\n"}
               여러분의 참여로 통계가 더욱 완벽해졌어요.{"\n\n"}
               더욱 기상천외하고 머리 아픈 질문들을 열심히 수집하고 있으니 잠시만 기다려주세요! 🙋‍♂️
             </p>
@@ -238,12 +238,12 @@ export default function VoteClient({
     return (
       <div className="flex h-[100dvh] w-full flex-col items-center justify-center bg-zinc-950 text-white font-sans p-6 text-center">
         <div className="flex flex-col items-center gap-8">
-          <div className="relative h-44 w-96 overflow-hidden mb-2">
+          <div className="relative h-44 w-80 overflow-hidden mb-2 rounded-2xl bg-white p-4 shadow-xl flex items-center justify-center">
             <Image
-              src="/logo.jpg"
-              alt="UPICK Logo"
+              src="/logo.png"
+              alt="UPick Logo"
               fill
-              className="object-contain"
+              className="object-contain p-2"
               priority
             />
           </div>

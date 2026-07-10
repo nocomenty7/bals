@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "UPICK - 모두의 밸런스게임",
-  description: "무지연으로 즐기는 애플 감성 미니멀 밸런스 게임, UPICK!",
+  title: "UPick - 당신의 선택은?",
+  description: "무지연으로 즐기는 애플 감성 미니멀 밸런스 게임, UPick!",
 };
 
 export const viewport = {
