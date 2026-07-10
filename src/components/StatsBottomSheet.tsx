@@ -43,9 +43,31 @@ export default function StatsBottomSheet({ questionId, onClose }: StatsBottomShe
           .from('vote_stats')
           .select('stats')
           .eq('question_id', questionId)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
+
+        if (!statsData || !statsData.stats) {
+          const defaultAgeGroups = ['10대', '20대', '30대', '40대', '50대', '60대', '70대 이상'].map((name) => ({
+            name,
+            countA: 0,
+            countB: 0,
+            percentA: 50.0,
+            percentB: 50.0,
+            total: 0
+          }));
+
+          setStats({
+            gender: {
+              maleA: 0, maleB: 0, maleAPercent: 50.0, maleBPercent: 50.0,
+              femaleA: 0, femaleB: 0, femaleAPercent: 50.0, femaleBPercent: 50.0
+            },
+            ageGroups: defaultAgeGroups,
+            totalVotes: 0
+          });
+          setLoading(false);
+          return;
+        }
 
         let totalVotes = 0;
         let maleA = 0;

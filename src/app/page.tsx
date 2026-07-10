@@ -51,7 +51,7 @@ export default async function Page({ searchParams }: PageProps) {
           .from('vote_stats')
           .select('stats')
           .eq('question_id', q)
-          .single();
+          .maybeSingle();
 
         if (statsError) {
           console.error('Error fetching vote stats:', statsError);
