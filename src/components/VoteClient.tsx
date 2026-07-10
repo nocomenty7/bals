@@ -239,12 +239,10 @@ export default function VoteClient({
       <div className="flex h-[100dvh] w-full flex-col items-center justify-center bg-zinc-950 text-white font-sans p-6 text-center">
         <div className="flex flex-col items-center gap-8">
           <div className="relative h-56 w-96 overflow-hidden mb-2 rounded-3xl bg-neutral-900/50 border border-neutral-800/80 p-4 shadow-2xl flex items-center justify-center backdrop-blur-sm">
-            <Image
+            <img
               src="/logo.png?v=2"
               alt="UPick Logo"
-              fill
-              className="object-contain p-3"
-              priority
+              className="max-h-full max-w-full object-contain p-3"
             />
           </div>
           <div className="flex flex-col items-center gap-3">
