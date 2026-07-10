@@ -190,9 +190,9 @@ export default function StatsBottomSheet({ questionId, onClose }: StatsBottomShe
                     <span className="text-neutral-300 font-extrabold text-sm">🙋‍♂️ 남성 통계</span>
                     {stats.gender.maleA + stats.gender.maleB > 0 ? (
                       <div className="space-x-1.5">
-                        <span className="text-amber-400">A선택 {stats.gender.maleAPercent}%</span>
+                        <span className="text-amber-400">{stats.gender.maleAPercent}%</span>
                         <span className="text-neutral-600">|</span>
-                        <span className="text-emerald-400">B선택 {stats.gender.maleBPercent}%</span>
+                        <span className="text-emerald-400">{stats.gender.maleBPercent}%</span>
                       </div>
                     ) : (
                       <span className="text-neutral-500 text-xs font-medium">참여한 남성 없음</span>
@@ -217,9 +217,9 @@ export default function StatsBottomSheet({ questionId, onClose }: StatsBottomShe
                     <span className="text-neutral-300 font-extrabold text-sm">🙋‍♀️ 여성 통계</span>
                     {stats.gender.femaleA + stats.gender.femaleB > 0 ? (
                       <div className="space-x-1.5">
-                        <span className="text-amber-400">A선택 {stats.gender.femaleAPercent}%</span>
+                        <span className="text-amber-400">{stats.gender.femaleAPercent}%</span>
                         <span className="text-neutral-600">|</span>
-                        <span className="text-emerald-400">B선택 {stats.gender.femaleBPercent}%</span>
+                        <span className="text-emerald-400">{stats.gender.femaleBPercent}%</span>
                       </div>
                     ) : (
                       <span className="text-neutral-500 text-xs font-medium">참여한 여성 없음</span>
@@ -252,9 +252,9 @@ export default function StatsBottomSheet({ questionId, onClose }: StatsBottomShe
                       <span className="text-neutral-300 font-extrabold text-xs">{group.name}</span>
                       {group.total > 0 ? (
                         <div className="text-[11px] font-bold space-x-1.5">
-                          <span className="text-amber-400">A {group.percentA}%</span>
+                          <span className="text-amber-400">{group.percentA}%</span>
                           <span className="text-zinc-700">/</span>
-                          <span className="text-emerald-400">B {group.percentB}%</span>
+                          <span className="text-emerald-400">{group.percentB}%</span>
                         </div>
                       ) : (
                         <span className="text-neutral-600 text-[10px] font-medium">투표 없음</span>
