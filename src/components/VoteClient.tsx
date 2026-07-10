@@ -51,6 +51,16 @@ export default function VoteClient({
   const router = useRouter();
   const [nextPrefetchedId, setNextPrefetchedId] = useState<string | null>(null);
 
+  const formatVoteCount = (count: number): string => {
+    if (count >= 1000000) {
+      return (count / 1000000).toFixed(1) + 'M';
+    }
+    if (count >= 1000) {
+      return (count / 1000).toFixed(1) + 'K';
+    }
+    return count.toLocaleString();
+  };
+
   const handleMenuResetClick = () => {
     const now = Date.now();
     if (now - lastMenuClickTime < 300) { // Double tap within 300ms
@@ -320,6 +330,13 @@ export default function VoteClient({
                   </div>
                   <nav className="flex flex-col gap-3">
                     <Link
+                      href="/about"
+                      onClick={() => setShowDrawer(false)}
+                      className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
+                    >
+                      <span>UPick 소개</span>
+                    </Link>
+                    <Link
                       href="/terms"
                       onClick={() => setShowDrawer(false)}
                       className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
@@ -441,7 +458,7 @@ export default function VoteClient({
               {hasVoted && selectedOption === 'A' && (
                 <div className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-extrabold text-zinc-950 shadow-md">
                   <span>✓</span>
-                  <span>내가 선택</span>
+                  <span>선택함</span>
                 </div>
               )}
 
@@ -479,7 +496,7 @@ export default function VoteClient({
                     >
                       <span className="text-4xl md:text-5xl font-black text-amber-400">{percentA.toFixed(1)}%</span>
                       <span className="text-xs text-neutral-500 block font-semibold mt-0.5">
-                        {votesA.toLocaleString()}명 선택
+                        {formatVoteCount(votesA)}명 선택
                       </span>
                     </motion.div>
                   )}
@@ -507,7 +524,7 @@ export default function VoteClient({
               {hasVoted && selectedOption === 'B' && (
                 <div className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-extrabold text-zinc-950 shadow-md">
                   <span>✓</span>
-                  <span>내가 선택</span>
+                  <span>선택함</span>
                 </div>
               )}
 
@@ -545,7 +562,7 @@ export default function VoteClient({
                     >
                       <span className="text-4xl md:text-5xl font-black text-emerald-400">{percentB.toFixed(1)}%</span>
                       <span className="text-xs text-neutral-500 block font-semibold mt-0.5">
-                        {votesB.toLocaleString()}명 선택
+                        {formatVoteCount(votesB)}명 선택
                       </span>
                     </motion.div>
                   )}
@@ -635,8 +652,14 @@ export default function VoteClient({
                   </button>
                 </div>
 
-                {/* Navigation Links list */}
                 <nav className="flex flex-col gap-3">
+                  <Link
+                    href="/about"
+                    onClick={() => setShowDrawer(false)}
+                    className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
+                  >
+                    <span>UPick 소개</span>
+                  </Link>
                   <Link
                     href="/terms"
                     onClick={() => setShowDrawer(false)}
