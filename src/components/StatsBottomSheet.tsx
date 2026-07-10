@@ -48,7 +48,7 @@ export default function StatsBottomSheet({ questionId, onClose }: StatsBottomShe
         if (error) throw error;
 
         if (!statsData || !statsData.stats) {
-          const defaultAgeGroups = ['10대', '20대', '30대', '40대', '50대', '60대', '70대 이상'].map((name) => ({
+          const defaultAgeGroups = ['10대', '20대', '30대', '40대', '50대', '60대 이상'].map((name) => ({
             name,
             countA: 0,
             countB: 0,
@@ -81,8 +81,7 @@ export default function StatsBottomSheet({ questionId, onClose }: StatsBottomShe
           '30대': { A: 0, B: 0 },
           '40대': { A: 0, B: 0 },
           '50대': { A: 0, B: 0 },
-          '60대': { A: 0, B: 0 },
-          '70대 이상': { A: 0, B: 0 }
+          '60대 이상': { A: 0, B: 0 }
         };
 
         if (statsData && statsData.stats) {
@@ -108,12 +107,10 @@ export default function StatsBottomSheet({ questionId, onClose }: StatsBottomShe
               let korAge = '';
               if (ageVal === '10s') korAge = '10대';
               else if (ageVal === '20s') korAge = '20대';
-              else if (ageVal === '35s' || ageVal === '30s') korAge = '30대'; // handle edge cases or typos defensively
               else if (ageVal === '30s') korAge = '30대';
               else if (ageVal === '40s') korAge = '40대';
               else if (ageVal === '50s') korAge = '50대';
-              else if (ageVal === '60s') korAge = '60대';
-              else if (ageVal === '70s') korAge = '70대 이상';
+              else if (ageVal === '60s' || ageVal === '70s') korAge = '60대 이상';
 
               if (korAge && ageMap[korAge]) {
                 if (isOptionA) {

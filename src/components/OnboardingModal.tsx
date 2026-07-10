@@ -9,7 +9,7 @@ interface OnboardingModalProps {
 }
 
 const GENDERS = ['남성', '여성'];
-const AGE_GROUPS = ['10대', '20대', '30대', '40대', '50대', '60대', '70대 이상'];
+const AGE_GROUPS = ['10대', '20대', '30대', '40대', '50대', '60대 이상'];
 
 export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
   const [selectedGender, setSelectedGender] = useState<string>('');
@@ -34,7 +34,13 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
       >
         {/* Brand Header */}
         <div className="mb-5 flex flex-col items-center">
-          <h2 className="text-3xl font-black tracking-tight mb-1 bg-gradient-to-r from-neutral-100 to-neutral-400 bg-clip-text text-transparent">UPick</h2>
+          <div className="relative h-11 w-32 mb-2 flex items-center justify-center mx-auto">
+            <img
+              src="/logo.png?v=2"
+              alt="UPick Logo"
+              className="max-h-full object-contain"
+            />
+          </div>
           <p className="text-xs text-neutral-400">간단한 프로필 선택 후, 당신의 선택을 보여주세요!</p>
         </div>
 

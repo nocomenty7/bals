@@ -141,8 +141,7 @@ export default function VoteClient({
     else if (ageGroup === '30대') ageKey = '30s';
     else if (ageGroup === '40대') ageKey = '40s';
     else if (ageGroup === '50대') ageKey = '50s';
-    else if (ageGroup === '60대') ageKey = '60s';
-    else if (ageGroup === '70대 이상') ageKey = '70s';
+    else if (ageGroup === '60대' || ageGroup === '60대 이상' || ageGroup === '70대 이상') ageKey = '60s';
 
     const optionKey = option.toLowerCase();
     const statKey = `${genderKey}_${ageKey}_${optionKey}`;
@@ -338,22 +337,13 @@ export default function VoteClient({
     );
   }
 
-  // Full Screen Prominent Logo in the main initial loading screen
+  // Full Screen Prominent Loading screen (without logo)
   if (!question) {
     return (
       <div className="flex h-[100dvh] w-full flex-col items-center justify-center bg-[#080911] text-white font-sans p-6 text-center">
-        <div className="flex flex-col items-center gap-8">
-          <div className="relative h-56 w-96 overflow-hidden mb-2 rounded-3xl bg-neutral-900/50 border border-neutral-800/80 p-4 shadow-2xl flex items-center justify-center backdrop-blur-sm">
-            <img
-              src="/logo.png?v=2"
-              alt="UPick Logo"
-              className="max-h-full max-w-full object-contain p-3"
-            />
-          </div>
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-t-transparent border-neutral-700" />
-            <p className="text-base font-semibold text-neutral-400">질문을 불러오고 있습니다...</p>
-          </div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-t-transparent border-neutral-700" />
+          <p className="text-base font-semibold text-neutral-400">질문을 불러오고 있습니다...</p>
         </div>
       </div>
     );
@@ -452,16 +442,15 @@ export default function VoteClient({
                 />
               )}
 
-              <div className="relative z-10 flex flex-col items-center text-center w-full max-w-xs pointer-events-none">
-                <div className="flex items-center gap-2 mb-1.5 justify-center">
+              <div className="relative z-10 flex flex-col items-center text-center w-full max-w-xs pointer-events-none gap-2">
+                <div className="flex items-center justify-center gap-2.5 w-full">
                   {question.emoji_a && (
-                    <span className="text-2xl leading-none">{question.emoji_a}</span>
+                    <span className="text-3xl leading-none shrink-0">{question.emoji_a}</span>
                   )}
+                  <p className="text-xl md:text-2xl font-black leading-tight text-neutral-100 max-h-24 overflow-y-auto">
+                    {question.option_a}
+                  </p>
                 </div>
-                
-                <p className="text-lg md:text-xl font-black leading-tight text-neutral-100 mb-1 max-h-24 overflow-y-auto">
-                  {question.option_a}
-                </p>
 
                 {/* Dynamic Vote Results (1 Decimal Place) */}
                 <AnimatePresence>
@@ -519,16 +508,15 @@ export default function VoteClient({
                 />
               )}
 
-              <div className="relative z-10 flex flex-col items-center text-center w-full max-w-xs pointer-events-none">
-                <div className="flex items-center gap-2 mb-1.5 justify-center">
+              <div className="relative z-10 flex flex-col items-center text-center w-full max-w-xs pointer-events-none gap-2">
+                <div className="flex items-center justify-center gap-2.5 w-full">
                   {question.emoji_b && (
-                    <span className="text-2xl leading-none">{question.emoji_b}</span>
+                    <span className="text-3xl leading-none shrink-0">{question.emoji_b}</span>
                   )}
+                  <p className="text-xl md:text-2xl font-black leading-tight text-neutral-100 max-h-24 overflow-y-auto">
+                    {question.option_b}
+                  </p>
                 </div>
-
-                <p className="text-lg md:text-xl font-black leading-tight text-neutral-100 mb-1 max-h-24 overflow-y-auto">
-                  {question.option_b}
-                </p>
 
                 {/* Dynamic Vote Results (1 Decimal Place) */}
                 <AnimatePresence>
