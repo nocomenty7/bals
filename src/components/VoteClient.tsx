@@ -49,6 +49,16 @@ export default function VoteClient({
 
   // 1. Initial configuration check (Demographics & Voted History)
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('reset') === 'true') {
+        localStorage.removeItem('upick_voted_questions');
+        localStorage.removeItem('upick_user_info');
+        window.location.href = '/';
+        return;
+      }
+    }
+
     const storedUser = localStorage.getItem('upick_user_info');
     if (storedUser) {
       setUserInfo(JSON.parse(storedUser));
@@ -295,13 +305,6 @@ export default function VoteClient({
                     >
                       <span>개인정보처리방침</span>
                     </Link>
-                    <a
-                      href="mailto:nocomenty7@gmail.com?subject=[UPick] 새로운 선택지 제안합니다!"
-                      onClick={() => setShowDrawer(false)}
-                      className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-emerald-400 transition-all hover:border-zinc-850"
-                    >
-                      <span>💡 선택지 제안하기</span>
-                    </a>
                     <a
                       href="mailto:nocomenty7@gmail.com"
                       onClick={() => setShowDrawer(false)}
@@ -631,13 +634,6 @@ export default function VoteClient({
                   >
                     <span>개인정보처리방침</span>
                   </Link>
-                  <a
-                    href="mailto:nocomenty7@gmail.com?subject=[UPick] 새로운 선택지 제안합니다!"
-                    onClick={() => setShowDrawer(false)}
-                    className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-emerald-400 transition-all hover:border-zinc-850"
-                  >
-                    <span>💡 선택지 제안하기</span>
-                  </a>
                   <a
                     href="mailto:nocomenty7@gmail.com"
                     onClick={() => setShowDrawer(false)}
