@@ -219,7 +219,7 @@ export default function VoteClient({
             <img
               src="/logo.png?v=2"
               alt="UPick Logo"
-              className="h-10 w-auto object-contain"
+              className="h-10 w-auto object-contain pt-[2px]"
             />
           </Link>
           <button
@@ -358,7 +358,7 @@ export default function VoteClient({
           <img
             src="/logo.png?v=2"
             alt="UPick Logo"
-            className="h-10 w-auto object-contain"
+            className="h-10 w-auto object-contain pt-[2px]"
           />
         </Link>
         <button
