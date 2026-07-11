@@ -412,11 +412,24 @@ export default function VoteClient({
           {/* Header Row: Category Badge (Left) and Share Button (Right) */}
           <div className="flex items-center justify-between shrink-0">
             {question.category ? (
-              <span className="inline-block rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-bold text-zinc-400 tracking-wide uppercase border border-zinc-850">
-                {question.category}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="inline-block rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-bold text-zinc-400 tracking-wide uppercase border border-zinc-850">
+                  {question.category}
+                </span>
+                {(votesA + votesB) < 10 && (
+                  <span className="inline-flex items-center rounded-full bg-yellow-500/10 border border-yellow-500/30 px-2 py-0.5 text-[9px] font-black text-yellow-500 tracking-wider uppercase animate-pulse">
+                    NEW
+                  </span>
+                )}
+              </div>
             ) : (
-              <div /> // Spacer
+              (votesA + votesB) < 10 ? (
+                <span className="inline-flex items-center rounded-full bg-yellow-500/10 border border-yellow-500/30 px-2 py-0.5 text-[9px] font-black text-yellow-500 tracking-wider uppercase animate-pulse">
+                  NEW
+                </span>
+              ) : (
+                <div /> // Spacer
+              )
             )}
 
             <button
