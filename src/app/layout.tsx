@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import GoogleAnalyticsTracker from "@/components/GoogleAnalyticsTracker";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -89,9 +90,10 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-1EQTDJBSD4');
+            gtag('config', 'G-1EQTDJBSD4', { send_page_view: false });
           `}
         </Script>
+        <GoogleAnalyticsTracker gaId="G-1EQTDJBSD4" />
         {children}
       </body>
     </html>
