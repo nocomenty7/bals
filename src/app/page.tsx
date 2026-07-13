@@ -6,14 +6,27 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Trophy, Users, ShieldAlert, Award, Menu, X, ArrowRight, BrainCircuit, BarChart3 } from 'lucide-react';
 
+import { supabase } from '../lib/supabase';
+
 function LandingClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const q = searchParams.get('q');
 
   const [showDrawer, setShowDrawer] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(['전체']);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('upick_filter_categories');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {}
+      }
+    }
+    return ['전체'];
+  });
   const [lastMenuClickTime, setLastMenuClickTime] = useState<number>(0);
+  const [questionCounts, setQuestionCounts] = useState<{ [key: string]: number }>({});
 
   // Backwards compatibility: Redirect shared urls to /play
   useEffect(() => {
@@ -22,12 +35,31 @@ function LandingClient() {
     }
   }, [q, router]);
 
-  // Load category filters from local storage
+  // Fetch category question counts dynamically on mount
   useEffect(() => {
-    const savedCats = localStorage.getItem('upick_filter_categories');
-    if (savedCats) {
-      setSelectedCategories(JSON.parse(savedCats));
-    }
+    const fetchCounts = async () => {
+      try {
+        const { data } = await supabase
+          .from('questions')
+          .select('category');
+        if (data) {
+          const counts: { [key: string]: number } = {};
+          let total = 0;
+          data.forEach((q: any) => {
+            const cat = q.category?.trim();
+            if (cat) {
+              counts[cat] = (counts[cat] || 0) + 1;
+              total++;
+            }
+          });
+          counts['전체'] = total;
+          setQuestionCounts(counts);
+        }
+      } catch (e) {
+        console.error('Failed to fetch category counts on landing:', e);
+      }
+    };
+    fetchCounts();
   }, []);
 
   const categoriesConfig = [
@@ -357,6 +389,7 @@ function LandingClient() {
                   <div className="mb-3">
                     {categoriesConfig.filter(c => c.name === '전체').map((cat) => {
                       const isActive = selectedCategories.includes(cat.name);
+                      const count = questionCounts[cat.name];
                       return (
                         <button
                           key={cat.name}
@@ -365,7 +398,7 @@ function LandingClient() {
                             isActive ? cat.activeClass : cat.inactiveClass
                           }`}
                         >
-                          {cat.name}
+                          {cat.name} {count !== undefined ? `(${count})` : ''}
                         </button>
                       );
                     })}
@@ -375,6 +408,7 @@ function LandingClient() {
                   <div className="flex flex-wrap gap-2">
                     {categoriesConfig.filter(c => c.name !== '전체').map((cat) => {
                       const isActive = selectedCategories.includes(cat.name);
+                      const count = questionCounts[cat.name];
                       return (
                         <button
                           key={cat.name}
@@ -383,7 +417,7 @@ function LandingClient() {
                             isActive ? cat.activeClass : cat.inactiveClass
                           }`}
                         >
-                          {cat.name}
+                          {cat.name} {count !== undefined ? `(${count})` : ''}
                         </button>
                       );
                     })}
