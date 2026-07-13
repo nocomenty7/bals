@@ -25,7 +25,7 @@ interface VoteClientProps {
   question: Question | null;
   initialVotesA: number;
   initialVotesB: number;
-  allQuestions: { id: string; question_no: number }[];
+  allQuestions: { id: string; question_no: number; category: string | null }[];
   serverError?: string | null;
 }
 
@@ -51,6 +51,54 @@ export default function VoteClient({
   const router = useRouter();
   const [nextPrefetchedId, setNextPrefetchedId] = useState<string | null>(null);
 
+  // ACCIDENTAL CLICK PROTECTION: vote cooldown on question change
+  const [voteCooldown, setVoteCooldown] = useState(true);
+
+  // CATEGORY FILTER STATE (Multi-select)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(['전체']);
+
+  const categoriesConfig = [
+    { name: '전체', activeClass: 'border-white bg-white text-zinc-950', inactiveClass: 'border-zinc-800 bg-zinc-900/50 text-neutral-400 hover:border-zinc-700' },
+    { name: '음식', activeClass: 'border-red-500 bg-red-500 text-white', inactiveClass: 'border-red-500/30 bg-red-500/5 text-red-400 hover:border-red-500/50' },
+    { name: '일상', activeClass: 'border-orange-500 bg-orange-500 text-white', inactiveClass: 'border-orange-500/30 bg-orange-500/5 text-orange-400 hover:border-orange-500/50' },
+    { name: '스타일', activeClass: 'border-purple-500 bg-purple-500 text-white', inactiveClass: 'border-purple-500/30 bg-purple-500/5 text-purple-400 hover:border-purple-500/50' },
+    { name: '여가', activeClass: 'border-green-500 bg-green-500 text-white', inactiveClass: 'border-green-500/30 bg-green-500/5 text-green-400 hover:border-green-500/50' },
+    { name: '관계', activeClass: 'border-blue-500 bg-blue-500 text-white', inactiveClass: 'border-blue-500/30 bg-blue-500/5 text-blue-400 hover:border-blue-500/50' },
+    { name: '돈', activeClass: 'border-[#8b5a2b] bg-[#8b5a2b] text-white', inactiveClass: 'border-[rgba(139,90,43,0.3)] bg-[rgba(139,90,43,0.05)] text-[#d2b48c] hover:border-[rgba(139,90,43,0.5)]' },
+    { name: '상상', activeClass: 'border-pink-500 bg-pink-500 text-white', inactiveClass: 'border-pink-500/30 bg-pink-500/5 text-pink-400 hover:border-pink-500/50' },
+    { name: '극한 밸런스게임', activeClass: 'border-neutral-500 bg-neutral-500 text-white', inactiveClass: 'border-neutral-500/30 bg-neutral-500/5 text-neutral-400 hover:border-neutral-500/50' }
+  ];
+
+  const getCategoryBadgeClass = (cat: string | null) => {
+    if (!cat) return 'bg-zinc-900 text-zinc-400 border-zinc-850';
+    const cleanCat = cat.trim();
+    if (cleanCat === '음식') return 'bg-red-500/10 text-red-500 border-red-500/20';
+    if (cleanCat === '일상') return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+    if (cleanCat === '스타일') return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+    if (cleanCat === '여가') return 'bg-green-500/10 text-green-500 border-green-500/20';
+    if (cleanCat === '관계') return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+    if (cleanCat === '돈') return 'bg-[rgba(139,90,43,0.1)] text-[#D2B48C] border-[rgba(139,90,43,0.2)]';
+    if (cleanCat === '상상') return 'bg-pink-500/10 text-pink-500 border-pink-500/20';
+    if (cleanCat === '극한 밸런스게임') return 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20';
+    return 'bg-zinc-900 text-zinc-400 border-zinc-850';
+  };
+
+  const handleToggleCategory = (catName: string) => {
+    if (catName === '전체') {
+      setSelectedCategories(['전체']);
+    } else {
+      setSelectedCategories((prev) => {
+        const next = prev.filter((c) => c !== '전체');
+        if (next.includes(catName)) {
+          const filtered = next.filter((c) => c !== catName);
+          return filtered.length === 0 ? ['전체'] : filtered;
+        } else {
+          return [...next, catName];
+        }
+      });
+    }
+  };
+
   const formatVoteCount = (count: number): string => {
     if (count >= 1000000) {
       return (count / 1000000).toFixed(1) + 'M';
@@ -71,6 +119,49 @@ export default function VoteClient({
     } else {
       setLastMenuClickTime(now);
     }
+  };
+
+  const handleResetHistory = () => {
+    localStorage.removeItem('upick_voted_questions');
+    localStorage.removeItem('upick_user_info');
+    window.location.reload();
+  };
+
+  // Cooldown timer trigger on question change
+  useEffect(() => {
+    setVoteCooldown(true);
+    const timer = setTimeout(() => setVoteCooldown(false), 450);
+    return () => clearTimeout(timer);
+  }, [question]);
+
+  // Load category filters from local storage or default
+  useEffect(() => {
+    const savedCats = localStorage.getItem('upick_filter_categories');
+    if (savedCats) {
+      setSelectedCategories(JSON.parse(savedCats));
+    }
+  }, []);
+
+  // Save category filters on state change
+  const updateSelectedCategories = (cats: string[]) => {
+    setSelectedCategories(cats);
+    localStorage.setItem('upick_filter_categories', JSON.stringify(cats));
+  };
+
+  const onToggleCategoryWrapper = (catName: string) => {
+    let next: string[] = [];
+    if (catName === '전체') {
+      next = ['전체'];
+    } else {
+      const activeWithoutAll = selectedCategories.filter((c) => c !== '전체');
+      if (activeWithoutAll.includes(catName)) {
+        next = activeWithoutAll.filter((c) => c !== catName);
+        if (next.length === 0) next = ['전체'];
+      } else {
+        next = [...activeWithoutAll, catName];
+      }
+    }
+    updateSelectedCategories(next);
   };
 
   // 1. Initial configuration check (Demographics & Voted History)
@@ -94,16 +185,22 @@ export default function VoteClient({
 
     const votedList = JSON.parse(localStorage.getItem('upick_voted_questions') || '[]');
     
+    // Category filter check helper
+    const matchesCategory = (q: any) => {
+      if (selectedCategories.includes('전체')) return true;
+      return selectedCategories.includes(q.category || '');
+    };
+
     if (question) {
       if (votedList.includes(question.id)) {
         setHasVoted(true);
       }
     } else if (allQuestions.length > 0) {
-      const unvoted = allQuestions.filter((q) => !votedList.includes(q.id));
+      const unvoted = allQuestions.filter((q) => !votedList.includes(q.id) && matchesCategory(q));
       
       if (unvoted.length > 0) {
         const randomQuestion = unvoted[Math.floor(Math.random() * unvoted.length)];
-        router.replace(`/?q=${randomQuestion.question_no}`);
+        router.replace(`/play?q=${randomQuestion.question_no}`);
       } else {
         // All questions completed! Show custom witty screen
         setNoMoreQuestions(true);
@@ -116,30 +213,41 @@ export default function VoteClient({
     } catch (e) {
       // Ads fail gracefully
     }
-  }, [question, allQuestions]);
+  }, [question, allQuestions, selectedCategories]);
+
   const handleOnboardingComplete = (data: { gender: string; age_group: string }) => {
     localStorage.setItem('upick_user_info', JSON.stringify(data));
     setUserInfo(data);
     setShowOnboarding(false);
   };
 
-  // 1.5. Prefetch next question in background once voted
+  // 1.5. Prefetch next question in background once voted, filtering by categories
   useEffect(() => {
     if (!hasVoted || !question || allQuestions.length === 0) return;
 
     const votedList = JSON.parse(localStorage.getItem('upick_voted_questions') || '[]');
-    const unvoted = allQuestions.filter((q) => !votedList.includes(q.id) && q.id !== question.id);
+    
+    const matchesCategory = (q: any) => {
+      if (selectedCategories.includes('전체')) return true;
+      return selectedCategories.includes(q.category || '');
+    };
+
+    const unvoted = allQuestions.filter(
+      (q) => !votedList.includes(q.id) && q.id !== question.id && matchesCategory(q)
+    );
 
     if (unvoted.length > 0) {
       const randomNext = unvoted[Math.floor(Math.random() * unvoted.length)];
       setNextPrefetchedId(randomNext.question_no.toString());
-      router.prefetch(`/?q=${randomNext.question_no}`);
+      router.prefetch(`/play?q=${randomNext.question_no}`);
+    } else {
+      setNextPrefetchedId(null);
     }
-  }, [hasVoted, question, allQuestions, router]);
+  }, [hasVoted, question, allQuestions, router, selectedCategories]);
 
   // 2. Zero-Latency Optimistic Voting
   const handleVote = async (option: 'A' | 'B') => {
-    if (hasVoted || !question) return;
+    if (hasVoted || !question || voteCooldown) return;
 
     setSelectedOption(option);
     setHasVoted(true);
@@ -190,17 +298,25 @@ export default function VoteClient({
     setRedirecting(true);
 
     if (nextPrefetchedId) {
-      router.replace(`/?q=${nextPrefetchedId}`);
+      router.replace(`/play?q=${nextPrefetchedId}`);
     } else {
       const votedList = JSON.parse(localStorage.getItem('upick_voted_questions') || '[]');
-      const unvoted = allQuestions.filter((q) => !votedList.includes(q.id) && (!question || q.id !== question.id));
+      
+      const matchesCategory = (q: any) => {
+        if (selectedCategories.includes('전체')) return true;
+        return selectedCategories.includes(q.category || '');
+      };
+
+      const unvoted = allQuestions.filter(
+        (q) => !votedList.includes(q.id) && (!question || q.id !== question.id) && matchesCategory(q)
+      );
 
       if (unvoted.length > 0) {
         const nextQuestion = unvoted[Math.floor(Math.random() * unvoted.length)];
-        router.replace(`/?q=${nextQuestion.question_no}`);
+        router.replace(`/play?q=${nextQuestion.question_no}`);
       } else {
         // Redirect to root, triggering the no-more-questions screen
-        router.replace('/');
+        router.replace('/play');
       }
     }
   };
@@ -270,24 +386,40 @@ export default function VoteClient({
             </div>
             <h2 className="text-2xl font-black mb-4">대단해요! 정복 완료 🎉</h2>
             <p className="text-sm text-zinc-400 leading-relaxed whitespace-pre-line mb-8">
-              UPick의 모든 질문에 답변하셨습니다!{"\n"}
+              선택한 카테고리의 모든 질문에 답변하셨습니다!{"\n"}
               여러분의 참여로 통계가 더욱 완벽해졌어요.{"\n\n"}
-              더욱 기상천외하고 머리 아픈 질문들을 열심히 수집하고 있으니 잠시만 기다려주세요! 🙋‍♂️
+              새 질문 제안이나 서랍 메뉴에서 카테고리를 변경해보세요! 🙋‍♂️
             </p>
-            <motion.a
-              whileTap={{ scale: 0.98 }}
-              href="mailto:nocomenty7@gmail.com?subject=[UPick] 새로운 선택지 제안합니다!"
-              className="flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-neutral-200 text-zinc-950 font-black px-6 h-12 text-sm shadow-lg w-full"
-            >
-              💡 새로운 선택지 제안하기
-            </motion.a>
+            <div className="flex flex-col gap-3 w-full">
+              <motion.a
+                whileTap={{ scale: 0.98 }}
+                href="mailto:nocomenty7@gmail.com?subject=[UPick] 새로운 선택지 제안합니다!"
+                className="flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-neutral-200 text-zinc-950 font-black px-6 h-12 text-sm shadow-lg w-full"
+              >
+                💡 새로운 선택지 제안하기
+              </motion.a>
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={handleResetHistory}
+                className="flex items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-neutral-350 font-extrabold px-6 h-12 text-sm shadow-md w-full"
+              >
+                🔄 처음부터 다시 하기
+              </motion.button>
+            </div>
           </motion.div>
         </div>
 
-        {/* Copyright Footer */}
-        <div className="text-[10px] text-center text-zinc-650 py-3 shrink-0">
-          © 2026 UPick. All rights reserved.
-        </div>
+        {/* Global Trust Footer */}
+        <footer className="w-full py-4 shrink-0 border-t border-zinc-900/40 text-center flex flex-col items-center gap-2">
+          <div className="flex items-center justify-center gap-3 text-[10px] text-neutral-500 font-extrabold">
+            <Link href="/privacy" className="hover:text-neutral-350 transition-all">개인정보처리방침</Link>
+            <span className="text-zinc-800">|</span>
+            <Link href="/terms" className="hover:text-neutral-350 transition-all">이용약관</Link>
+            <span className="text-zinc-800">|</span>
+            <a href="mailto:nocomenty7@gmail.com" className="hover:text-neutral-350 transition-all">문의하기</a>
+          </div>
+          <p className="text-[9px] text-neutral-600">© 2026 UPick. All rights reserved.</p>
+        </footer>
 
         {/* Bottom Ad */}
         <div className="adsense-slot adsense-bottom flex justify-center bg-zinc-900/20 border-t border-zinc-900/50 shrink-0" style={{ minHeight: '100px', width: '100%' }}>
@@ -318,7 +450,7 @@ export default function VoteClient({
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
                 className="relative z-10 w-4/5 max-w-xs h-full bg-[#080911]/98 border-l border-zinc-900 p-6 flex flex-col justify-between text-white shadow-2xl backdrop-blur-xl"
               >
-                <div className="space-y-8">
+                <div className="space-y-6 overflow-y-auto max-h-[85vh] pr-1">
                   <div className="flex items-center justify-between border-b border-zinc-900 pb-4">
                     <span onClick={handleMenuResetClick} className="font-black tracking-widest text-lg text-neutral-200 cursor-pointer select-none">MENU</span>
                     <button
@@ -328,36 +460,38 @@ export default function VoteClient({
                       <X className="h-5 w-5" />
                     </button>
                   </div>
-                  <nav className="flex flex-col gap-3">
+                  
+                  {/* General Pages Navigation links */}
+                  <nav className="flex flex-col gap-2">
                     <Link
                       href="/about"
                       onClick={() => setShowDrawer(false)}
-                      className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
+                      className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-3 text-xs font-extrabold text-neutral-250 transition-all hover:border-zinc-800"
                     >
                       <span>UPick 소개</span>
                     </Link>
-                    <Link
-                      href="/terms"
-                      onClick={() => setShowDrawer(false)}
-                      className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
-                    >
-                      <span>이용약관</span>
-                    </Link>
-                    <Link
-                      href="/privacy"
-                      onClick={() => setShowDrawer(false)}
-                      className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
-                    >
-                      <span>개인정보처리방침</span>
-                    </Link>
-                    <a
-                      href="mailto:nocomenty7@gmail.com"
-                      onClick={() => setShowDrawer(false)}
-                      className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
-                    >
-                      <span>문의하기</span>
-                    </a>
                   </nav>
+
+                  {/* Section Divider */}
+                  <div className="border-t border-zinc-900/80 pt-4">
+                    <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-3">카테고리 필터</span>
+                    <div className="flex flex-wrap gap-2">
+                      {categoriesConfig.map((cat) => {
+                        const isActive = selectedCategories.includes(cat.name);
+                        return (
+                          <button
+                            key={cat.name}
+                            onClick={() => onToggleCategoryWrapper(cat.name)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-black border transition-all cursor-pointer ${
+                              isActive ? cat.activeClass : cat.inactiveClass
+                            }`}
+                          >
+                            {cat.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
                 <div className="text-[10px] text-neutral-600 leading-normal text-center border-t border-zinc-900/40 pt-4">
                   <p>© 2026 UPick. All rights reserved.</p>
@@ -404,16 +538,16 @@ export default function VoteClient({
       </header>
 
       {/* 3. Main Dynamic Content Area (Expanded to occupy maximal vertical height) */}
-      <main className="flex-1 flex flex-col min-h-0 px-4 py-4 justify-between">
+      <main className="flex-1 flex flex-col min-h-0 px-4 py-3 justify-between">
         
         {/* Game Capture Area (Captured for Image Export) */}
-        <div id="game-capture-area" className="flex flex-col bg-[#0b0c16]/50 p-4 rounded-3xl border border-zinc-900/80 gap-4 flex-1 min-h-0">
+        <div id="game-capture-area" className="flex flex-col bg-[#0b0c16]/50 p-4 rounded-3xl border border-zinc-900/80 gap-3.5 flex-1 min-h-0">
           
           {/* Header Row: Category Badge (Left) and Share Button (Right) */}
           <div className="flex items-center justify-between shrink-0">
             {question.category ? (
               <div className="flex items-center gap-2">
-                <span className="inline-block rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-bold text-zinc-400 tracking-wide uppercase border border-zinc-850">
+                <span className={`inline-block rounded-full px-3 py-1 text-xs font-black tracking-wide uppercase border ${getCategoryBadgeClass(question.category)}`}>
                   {question.category}
                 </span>
                 {(votesA + votesB) < 10 && (
@@ -434,22 +568,22 @@ export default function VoteClient({
 
             <button
               onClick={() => setShowShareSheet(true)}
-              className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-2.5 hover:bg-zinc-900 hover:text-white transition text-zinc-400 shadow-sm"
+              className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-2 hover:bg-zinc-900 hover:text-white transition text-zinc-400 shadow-sm"
               title="공유하기"
             >
-              <Share2 className="h-4.5 w-4.5" />
+              <Share2 className="h-4 w-4" />
             </button>
           </div>
 
           {/* Question Title Header - Large & Bold inside capture block */}
-          <div className="text-center py-1 shrink-0">
-            <h1 className="text-2xl md:text-3xl font-extrabold leading-snug text-neutral-100 tracking-tight whitespace-pre-line px-2">
+          <div className="text-center py-0.5 shrink-0">
+            <h1 className="text-xl md:text-2xl font-black leading-snug text-neutral-100 tracking-tight whitespace-pre-line px-1">
               {question.title}
             </h1>
           </div>
 
           {/* Voting Stack Container */}
-          <div className="flex-grow flex flex-col gap-4 min-h-0 relative">
+          <div className="flex-grow flex flex-col gap-3 min-h-0 relative">
             
             {/* Card Option A (Top) */}
             <motion.button
@@ -458,8 +592,8 @@ export default function VoteClient({
               style={{ flexGrow: hasVoted ? displayGrowA : 50 }}
               whileTap={{ scale: hasVoted ? 1 : 0.98 }}
               onClick={() => handleVote('A')}
-              disabled={hasVoted}
-              className={`relative flex w-full flex-col items-center justify-center overflow-hidden rounded-2xl py-4 px-5 transition-all duration-300 text-left border ${
+              disabled={hasVoted || voteCooldown}
+              className={`relative flex w-full flex-col items-center justify-center overflow-hidden rounded-2xl py-3.5 px-4 transition-all duration-300 text-left border ${
                 hasVoted
                   ? selectedOption === 'A'
                     ? 'bg-zinc-900/90 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.15)]'
@@ -467,9 +601,9 @@ export default function VoteClient({
                   : 'bg-zinc-900/50 border-zinc-800/80 hover:bg-zinc-900/80 hover:border-zinc-700'
               }`}
             >
-              {/* Checkmark indicator for selected card */}
+              {/* Checkmark indicator for selected card - REPOSITIONED TO BOTTOM RIGHT */}
               {hasVoted && selectedOption === 'A' && (
-                <div className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-extrabold text-zinc-950 shadow-md">
+                <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[9px] font-black text-zinc-950 shadow-md">
                   <span>✓</span>
                   <span>선택함</span>
                 </div>
@@ -488,29 +622,27 @@ export default function VoteClient({
                 />
               )}
 
-              <div className="relative z-10 flex flex-col items-center text-center w-full max-w-xs pointer-events-none gap-2">
+              <div className="relative z-10 flex flex-col items-center text-center w-full max-w-xs pointer-events-none gap-1.5">
                 <div className="flex items-center justify-center gap-2.5 w-full">
                   {question.emoji_a && (
                     <span className="text-3xl leading-none shrink-0">{question.emoji_a}</span>
                   )}
-                  <p className="text-xl md:text-2xl font-black leading-tight text-neutral-100 max-h-24 overflow-y-auto">
+                  <p className="text-xl md:text-2xl font-black leading-tight text-neutral-100 max-h-16 overflow-y-auto">
                     {question.option_a}
                   </p>
                 </div>
 
-                {/* Dynamic Vote Results (1 Decimal Place) */}
+                {/* Dynamic Vote Results (1 Decimal Place) - MULTI-LINE SAVING LAYOUT */}
                 <AnimatePresence>
                   {hasVoted && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: 'spring', damping: 15 }}
-                      className="mt-1"
+                      className="flex items-baseline justify-center gap-1.5 mt-1"
                     >
-                      <span className="text-4xl md:text-5xl font-black text-amber-400">{percentA.toFixed(1)}%</span>
-                      <span className="text-xs text-neutral-500 block font-semibold mt-0.5">
-                        {formatVoteCount(votesA)}명 선택
-                      </span>
+                      <span className="text-3xl md:text-4xl font-black text-amber-400">{percentA.toFixed(1)}%</span>
+                      <span className="text-xs text-neutral-500 font-extrabold">({formatVoteCount(votesA)}명)</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -524,8 +656,8 @@ export default function VoteClient({
               style={{ flexGrow: hasVoted ? displayGrowB : 50 }}
               whileTap={{ scale: hasVoted ? 1 : 0.98 }}
               onClick={() => handleVote('B')}
-              disabled={hasVoted}
-              className={`relative flex w-full flex-col items-center justify-center overflow-hidden rounded-2xl py-4 px-5 transition-all duration-300 text-left border ${
+              disabled={hasVoted || voteCooldown}
+              className={`relative flex w-full flex-col items-center justify-center overflow-hidden rounded-2xl py-3.5 px-4 transition-all duration-300 text-left border ${
                 hasVoted
                   ? selectedOption === 'B'
                     ? 'bg-zinc-900/90 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
@@ -533,9 +665,9 @@ export default function VoteClient({
                   : 'bg-zinc-900/50 border-zinc-800/80 hover:bg-zinc-900/80 hover:border-zinc-700'
               }`}
             >
-              {/* Checkmark indicator for selected card */}
+              {/* Checkmark indicator for selected card - REPOSITIONED TO BOTTOM RIGHT */}
               {hasVoted && selectedOption === 'B' && (
-                <div className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-extrabold text-zinc-950 shadow-md">
+                <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[9px] font-black text-zinc-950 shadow-md">
                   <span>✓</span>
                   <span>선택함</span>
                 </div>
@@ -554,29 +686,27 @@ export default function VoteClient({
                 />
               )}
 
-              <div className="relative z-10 flex flex-col items-center text-center w-full max-w-xs pointer-events-none gap-2">
+              <div className="relative z-10 flex flex-col items-center text-center w-full max-w-xs pointer-events-none gap-1.5">
                 <div className="flex items-center justify-center gap-2.5 w-full">
                   {question.emoji_b && (
                     <span className="text-3xl leading-none shrink-0">{question.emoji_b}</span>
                   )}
-                  <p className="text-xl md:text-2xl font-black leading-tight text-neutral-100 max-h-24 overflow-y-auto">
+                  <p className="text-xl md:text-2xl font-black leading-tight text-neutral-100 max-h-16 overflow-y-auto">
                     {question.option_b}
                   </p>
                 </div>
 
-                {/* Dynamic Vote Results (1 Decimal Place) */}
+                {/* Dynamic Vote Results (1 Decimal Place) - MULTI-LINE SAVING LAYOUT */}
                 <AnimatePresence>
                   {hasVoted && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: 'spring', damping: 15 }}
-                      className="mt-1"
+                      className="flex items-baseline justify-center gap-1.5 mt-1"
                     >
-                      <span className="text-4xl md:text-5xl font-black text-emerald-400">{percentB.toFixed(1)}%</span>
-                      <span className="text-xs text-neutral-500 block font-semibold mt-0.5">
-                        {formatVoteCount(votesB)}명 선택
-                      </span>
+                      <span className="text-3xl md:text-4xl font-black text-emerald-400">{percentB.toFixed(1)}%</span>
+                      <span className="text-xs text-neutral-500 font-extrabold">({formatVoteCount(votesB)}명)</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -588,14 +718,14 @@ export default function VoteClient({
 
         {/* Action Controls & Navigation (Post-Vote only) */}
         {hasVoted && (
-          <div className="h-16 shrink-0 flex items-center justify-between gap-3 mt-3">
+          <div className="h-14 shrink-0 flex items-center justify-between gap-3 mt-2.5">
             <motion.button
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               onClick={() => setShowStats(true)}
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 px-5 h-12 text-base font-bold text-neutral-200 transition-all flex-1 shadow-md"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 px-5 h-11 text-sm font-bold text-neutral-200 transition-all flex-1 shadow-md"
             >
-              <BarChart3 className="h-4.5 w-4.5 text-neutral-400" /> 통계 보기
+              <BarChart3 className="h-4 w-4 text-neutral-400" /> 통계 보기
             </motion.button>
             
             <motion.button
@@ -603,12 +733,12 @@ export default function VoteClient({
               animate={{ opacity: 1, y: 0 }}
               onClick={handleNextQuestion}
               disabled={redirecting}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-white hover:bg-neutral-200 text-zinc-950 font-extrabold px-6 h-12 text-base transition-all flex-[1.4] shadow-lg disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-white hover:bg-neutral-200 text-zinc-950 font-extrabold px-6 h-11 text-sm transition-all flex-[1.4] shadow-lg disabled:opacity-50"
             >
               {redirecting ? (
-                <span className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-950 border-t-transparent" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950 border-t-transparent" />
               ) : (
-                <>다음 질문 <ChevronRight className="h-5 w-5" /></>
+                <>다음 질문 <ChevronRight className="h-4.5 w-4.5" /></>
               )}
             </motion.button>
           </div>
@@ -616,10 +746,17 @@ export default function VoteClient({
 
       </main>
 
-      {/* Copyright Footer */}
-      <div className="text-[10px] text-center text-zinc-650 py-3 shrink-0">
-        © 2026 UPick. All rights reserved.
-      </div>
+      {/* Global Trust Footer */}
+      <footer className="w-full py-4 shrink-0 border-t border-zinc-900/40 text-center flex flex-col items-center gap-2">
+        <div className="flex items-center justify-center gap-3 text-[10px] text-neutral-500 font-extrabold">
+          <Link href="/privacy" className="hover:text-neutral-350 transition-all">개인정보처리방침</Link>
+          <span className="text-zinc-800">|</span>
+          <Link href="/terms" className="hover:text-neutral-350 transition-all">이용약관</Link>
+          <span className="text-zinc-800">|</span>
+          <a href="mailto:nocomenty7@gmail.com" className="hover:text-neutral-350 transition-all">문의하기</a>
+        </div>
+        <p className="text-[9px] text-neutral-650">© 2026 UPick. All rights reserved.</p>
+      </footer>
 
       {/* 4. AdSense Bottom Slot */}
       <div className="adsense-slot adsense-bottom flex justify-center bg-zinc-900/20 border-t border-zinc-900/50 shrink-0" style={{ minHeight: '100px', width: '100%' }}>
@@ -653,7 +790,7 @@ export default function VoteClient({
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
               className="relative z-10 w-4/5 max-w-xs h-full bg-[#080911]/98 border-l border-zinc-900 p-6 flex flex-col justify-between text-white shadow-2xl backdrop-blur-xl"
             >
-              <div className="space-y-8">
+              <div className="space-y-6 overflow-y-auto max-h-[85vh] pr-1">
                 {/* Header Inside Drawer */}
                 <div className="flex items-center justify-between border-b border-zinc-900 pb-4">
                   <span onClick={handleMenuResetClick} className="font-black tracking-widest text-lg text-neutral-200 cursor-pointer select-none">MENU</span>
@@ -665,36 +802,37 @@ export default function VoteClient({
                   </button>
                 </div>
 
-                <nav className="flex flex-col gap-3">
+                {/* Navigation Links list */}
+                <nav className="flex flex-col gap-2">
                   <Link
                     href="/about"
                     onClick={() => setShowDrawer(false)}
-                    className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
+                    className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-3 text-xs font-extrabold text-neutral-250 transition-all hover:border-zinc-800"
                   >
                     <span>UPick 소개</span>
                   </Link>
-                  <Link
-                    href="/terms"
-                    onClick={() => setShowDrawer(false)}
-                    className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
-                  >
-                    <span>이용약관</span>
-                  </Link>
-                  <Link
-                    href="/privacy"
-                    onClick={() => setShowDrawer(false)}
-                    className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
-                  >
-                    <span>개인정보처리방침</span>
-                  </Link>
-                  <a
-                    href="mailto:nocomenty7@gmail.com"
-                    onClick={() => setShowDrawer(false)}
-                    className="flex items-center gap-3 rounded-2xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-900 p-4 text-sm font-extrabold text-neutral-200 transition-all hover:border-zinc-800"
-                  >
-                    <span>문의하기</span>
-                  </a>
                 </nav>
+
+                {/* Notion Category Filter Section */}
+                <div className="border-t border-zinc-900/80 pt-4">
+                  <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-3">카테고리 필터</span>
+                  <div className="flex flex-wrap gap-2">
+                    {categoriesConfig.map((cat) => {
+                      const isActive = selectedCategories.includes(cat.name);
+                      return (
+                        <button
+                          key={cat.name}
+                          onClick={() => onToggleCategoryWrapper(cat.name)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-black border transition-all cursor-pointer ${
+                            isActive ? cat.activeClass : cat.inactiveClass
+                          }`}
+                        >
+                          {cat.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               {/* Footer inside Drawer */}
@@ -719,7 +857,7 @@ export default function VoteClient({
         {showShareSheet && question && (
           <ShareSheet
             onClose={() => setShowShareSheet(false)}
-            shareUrl={`${window.location.origin}/?q=${question.question_no}`}
+            shareUrl={`${window.location.origin}/play?q=${question.question_no}`}
             questionTitle={question.title}
           />
         )}

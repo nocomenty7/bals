@@ -50,8 +50,16 @@ export default function TermsPage() {
         </main>
       </div>
 
-      <footer className="text-center text-xs text-zinc-600 pt-10 mt-10 border-t border-zinc-900/60">
-        &copy; {new Date().getFullYear()} UPick. All rights reserved.
+      {/* Global Trust Footer */}
+      <footer className="w-full py-6 shrink-0 border-t border-zinc-900/40 text-center flex flex-col items-center gap-2.5 mt-10">
+        <div className="flex items-center gap-3 text-xs text-neutral-500 font-extrabold">
+          <Link href="/privacy" className="hover:text-neutral-300 transition-all">개인정보처리방침</Link>
+          <span className="text-zinc-800">|</span>
+          <Link href="/terms" className="hover:text-neutral-300 transition-all">이용약관</Link>
+          <span className="text-zinc-800">|</span>
+          <a href="mailto:nocomenty7@gmail.com" className="hover:text-neutral-300 transition-all">문의하기</a>
+        </div>
+        <p className="text-[10px] text-neutral-600">© 2026 UPick. All rights reserved.</p>
       </footer>
     </div>
   );

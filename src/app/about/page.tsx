@@ -31,12 +31,13 @@ export default function AboutPage() {
       <header className="w-full h-14 shrink-0 flex items-center justify-between px-4 border-b border-zinc-900 bg-[#080911]/85 backdrop-blur-md sticky top-0 z-40">
         <Link
           href="/"
-          className="flex items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-xs font-bold text-neutral-400 hover:text-white transition shadow-sm"
+          className="flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/30 w-9 h-9 text-neutral-400 hover:text-white transition shadow-sm"
+          title="돌아가기"
         >
-          <ChevronLeft className="h-4 w-4" /> 밸런스 게임
+          <ChevronLeft className="h-5 w-5" />
         </Link>
         <h1 className="text-sm font-black tracking-wider text-neutral-300">UPick 소개</h1>
-        <div className="w-[84px]" /> {/* Spacer */}
+        <div className="w-9 h-9" /> {/* Spacer */}
       </header>
 
       {/* Main Content Area */}
