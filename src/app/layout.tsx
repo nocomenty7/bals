@@ -47,6 +47,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full antialiased dark">
       <head>
+        <meta name="naver-site-verification" content="aa867b3c75b1169bbf1474f38f3d20d18e83a4bc" />
         <link rel="icon" href="/favicon.ico" />
         <link
           rel="stylesheet"
