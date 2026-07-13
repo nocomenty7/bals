@@ -121,39 +121,71 @@ function LandingClient() {
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-1 text-xs font-black text-indigo-400 tracking-wider uppercase"
+            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-4 py-1 text-xs font-black text-emerald-455 tracking-wider uppercase"
           >
-            <Sparkles className="h-3.5 w-3.5" /> next-gen balance game
+            <Sparkles className="h-3.5 w-3.5" /> 별도의 회원가입 · 로그인 없이 즉시 플레이
           </motion.div>
+          
           <motion.h1 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-black leading-tight tracking-tight text-neutral-100 whitespace-pre-line"
+            className="text-2xl md:text-3xl font-black leading-snug tracking-tight text-neutral-100 px-2"
           >
-            당신의 숨겨진 취향을{"\n"}발견하는 극한 딜레마
+            당신의 취향은 다수입니까, 소수입니까?{"\n"}
+            끝없는 양자택일과 밸런스게임.{"\n"}
+            UPick에 오신걸 환영합니다!
           </motion.h1>
+
+          {/* Modern SaaS Value Propositions */}
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs font-bold text-neutral-450"
+          >
+            <span className="flex items-center gap-1">⚡️ 가입없이 0초 실행</span>
+            <span className="text-zinc-800">•</span>
+            <span className="flex items-center gap-1">🔒 100% 익명 통계</span>
+            <span className="text-zinc-800">•</span>
+            <span className="flex items-center gap-1">🔥 200+ 극한 딜레마</span>
+          </motion.div>
+
           <motion.p 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-sm md:text-base text-neutral-400 max-w-lg mx-auto leading-relaxed"
+            className="text-xs md:text-sm text-neutral-400 max-w-lg mx-auto leading-relaxed"
           >
             200개가 넘는 기상천외한 질문들로 당신의 무의식을 들여다보세요.{"\n"}
             성별, 연령대별 실시간 통계 분석을 통해 타인과의 가치관 싱크율을 체크합니다.
           </motion.p>
+
+          {/* Hero Gameplay Image Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="relative w-full max-w-lg mx-auto rounded-3xl overflow-hidden border border-zinc-800/80 bg-zinc-950/40 p-1.5 shadow-[0_0_40px_rgba(99,102,241,0.15)] group"
+          >
+            <img
+              src="/hero-preview.png"
+              alt="UPick Gameplay Preview"
+              className="w-full h-auto object-cover rounded-2xl transition-all duration-500 group-hover:scale-[1.01]"
+            />
+          </motion.div>
           
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.35 }}
             className="pt-4 max-w-sm mx-auto"
           >
             <Link
               href="/play"
               className="flex items-center justify-center gap-2 rounded-2xl bg-white hover:bg-neutral-200 text-zinc-950 font-black text-lg px-8 h-14 shadow-[0_0_30px_rgba(99,102,241,0.25)] transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
-              🎮 밸런스 게임 시작하기
+              🎮 시작하기
             </Link>
           </motion.div>
         </section>
@@ -196,7 +228,7 @@ function LandingClient() {
               <BrainCircuit className="h-6 w-6" />
             </div>
             <h3 className="text-xl font-extrabold text-neutral-100">8가지 고유 카테고리 필터링</h3>
-            <p className="text-sm text-neutral-400 leading-relaxed">
+            <p className="text-sm text-neutral-450 leading-relaxed">
               음식, 일상, 스타일, 여가, 관계, 돈, 상상, 그리고 초매운맛 극한 밸런스게임까지. 서랍 메뉴에서 원하는 카테고리만 쏙 골라 즐길 수 있습니다.
             </p>
           </div>
@@ -206,9 +238,17 @@ function LandingClient() {
               <BarChart3 className="h-6 w-6" />
             </div>
             <h3 className="text-xl font-extrabold text-neutral-100">성별 및 연령대 통계 시각화</h3>
-            <p className="text-sm text-neutral-400 leading-relaxed">
+            <p className="text-sm text-neutral-450 leading-relaxed mb-2">
               내가 투표한 즉시 다른 플레이어들의 선호도가 실시간으로 통계 차트에 집계됩니다. 나와 동일한 성별, 연령대가 나열된 고도화된 타겟 분석을 만나보세요.
             </p>
+            {/* Embedded Stats Graphic Showcase */}
+            <div className="pt-2 rounded-2xl overflow-hidden border border-zinc-850 bg-zinc-950/60 shadow-inner">
+              <img
+                src="/stats-preview.png"
+                alt="Realtime Stats Preview"
+                className="w-full h-auto object-cover opacity-95"
+              />
+            </div>
           </div>
 
           <div className="group rounded-3xl border border-zinc-900 bg-zinc-900/10 p-8 space-y-4 hover:border-zinc-800 transition-all duration-300">
@@ -216,7 +256,7 @@ function LandingClient() {
               <Users className="h-6 w-6" />
             </div>
             <h3 className="text-xl font-extrabold text-neutral-100">로그인 없는 제로-레이턴시 이용</h3>
-            <p className="text-sm text-neutral-400 leading-relaxed">
+            <p className="text-sm text-neutral-450 leading-relaxed">
               불필요한 가입 절차 없이, 익명으로 누르면 즉시 연산 데이터베이스에 기록됩니다. 로컬 스토리지에 자동 저장되므로 중복 투표 없이 쾌적한 밸런싱이 가능합니다.
             </p>
           </div>
@@ -224,7 +264,7 @@ function LandingClient() {
         </section>
 
         {/* Informative Blog Content Block */}
-        <section className="border-t border-zinc-900/60 pt-16 max-w-xl mx-auto space-y-8 text-neutral-300 leading-relaxed text-sm md:text-base">
+        <section className="border-t border-zinc-900/60 pt-16 max-w-xl mx-auto space-y-8 text-neutral-350 leading-relaxed text-sm md:text-base">
           <p className="indent-4 leading-loose">
             현대인들은 매일 수많은 선택의 기로에 놓입니다. 오늘 점심은 무엇을 먹을지, 주말에는 어떤 여가를 즐길지, 혹은 인간관계에서 어떤 태도를 취해야 할지 끊임없이 고민합니다. <strong className="text-neutral-100 font-extrabold">'UPick(유픽)'</strong>은 이러한 일상적인 고민부터, 상상조차 하기 싫은 극한의 딜레마까지 200개가 넘는 다양한 밸런스 게임을 통해 여러분의 숨겨진 심리와 취향을 탐구하는 종합 엔터테인먼트 플랫폼입니다.
           </p>
@@ -233,7 +273,7 @@ function LandingClient() {
             <h4 className="text-base font-extrabold text-neutral-200 flex items-center gap-2">
               <Trophy className="h-4.5 w-4.5 text-amber-500" /> 왜 사람들은 밸런스 게임에 열광할까요?
             </h4>
-            <p className="text-xs md:text-sm text-neutral-450 leading-relaxed">
+            <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               심리학적으로 인간은 극단적인 상황에 놓였을 때 비로소 자신의 본성과 우선순위를 가장 명확하게 드러낸다고 합니다. 일시불로 보상을 받을지 혹은 연금 형태로 장기적 가치를 추구할지와 같은 미세한 질문들조차 사람의 기본 철학과 자아를 투영합니다. 나와 같은 선택을 한 사람이 얼마나 되는지 확인하며 깊은 공감대를 형성해 보세요.
             </p>
           </div>
@@ -242,29 +282,18 @@ function LandingClient() {
             <h4 className="text-base font-extrabold text-red-400 flex items-center gap-2">
               <ShieldAlert className="h-4.5 w-4.5" /> 개인정보 걱정 없는 깔끔한 익명 환경
             </h4>
-            <p className="text-xs md:text-sm text-neutral-450 leading-relaxed">
+            <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               이 모든 테스트는 익명으로 안전하게 진행됩니다. 사용자가 입력한 나이대와 성별 이외의 식별 데이터는 일절 수집하거나 연동하지 않습니다. 안심하고 솔직한 마음으로 당신의 한계를 시험할 밸런스 게임을 시작하세요!
             </p>
           </div>
-        </section>
 
-        {/* Recommended AI Graphics Generation instructions */}
-        <section className="rounded-3xl border border-dashed border-zinc-800 bg-zinc-950 p-6 max-w-xl mx-auto space-y-4">
-          <h4 className="text-sm font-extrabold text-neutral-300 flex items-center gap-2">
-            <Award className="h-4.5 w-4.5 text-indigo-400" /> 추천 AI 이미지 프롬프트 안내
-          </h4>
-          <p className="text-xs text-neutral-450 leading-relaxed">
-            더욱 화려한 그래픽 연출을 원하신다면 아래 프롬프트로 이미지를 생성하여 프로젝트 루트의 <code className="text-indigo-300 font-mono">public/</code> 폴더에 저장해 주세요.
-          </p>
-          <div className="space-y-3 text-xs">
-            <div className="p-3.5 rounded-xl bg-zinc-900/50 border border-zinc-900">
-              <span className="font-extrabold text-neutral-200 block mb-1">🖼️ 메인 히어로 프리뷰 이미지 (public/hero-preview.png)</span>
-              <p className="text-neutral-400 italic">"Premium dark mode cybernetic balance game UI showing split choices A and B, neon glowing blue and orange, highly detailed, premium SaaS aesthetic, 3D claymation design style, transparent background"</p>
-            </div>
-            <div className="p-3.5 rounded-xl bg-zinc-900/50 border border-zinc-900">
-              <span className="font-extrabold text-neutral-200 block mb-1">📊 통계 대시보드 그래픽 (public/stats-preview.png)</span>
-              <p className="text-neutral-400 italic">"Futuristic glassmorphic target audience charts showing demographics percentages, gender splits, beautiful purple gradients, premium minimalist web vector asset"</p>
-            </div>
+          <div className="w-full pt-4">
+            <Link
+              href="/play"
+              className="flex items-center justify-center gap-2 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white font-extrabold text-base px-8 h-12 border border-zinc-800 transition-all text-center"
+            >
+              🚀 시작하기
+            </Link>
           </div>
         </section>
 
@@ -326,8 +355,28 @@ function LandingClient() {
                 {/* Category Filter Section */}
                 <div className="border-t border-zinc-900/80 pt-4">
                   <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-3">카테고리 필터</span>
+                  
+                  {/* Option 1: 전체 (Top on its own row) */}
+                  <div className="mb-3">
+                    {categoriesConfig.filter(c => c.name === '전체').map((cat) => {
+                      const isActive = selectedCategories.includes(cat.name);
+                      return (
+                        <button
+                          key={cat.name}
+                          onClick={() => onToggleCategoryWrapper(cat.name)}
+                          className={`w-full px-3 py-2 rounded-full text-xs font-black border transition-all cursor-pointer text-center ${
+                            isActive ? cat.activeClass : cat.inactiveClass
+                          }`}
+                        >
+                          {cat.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Option 2: Remaining categories (Grid/Wrap below) */}
                   <div className="flex flex-wrap gap-2">
-                    {categoriesConfig.map((cat) => {
+                    {categoriesConfig.filter(c => c.name !== '전체').map((cat) => {
                       const isActive = selectedCategories.includes(cat.name);
                       return (
                         <button
@@ -349,7 +398,6 @@ function LandingClient() {
 
                 {/* Additional Trust Links Inside Drawer */}
                 <div className="border-t border-zinc-900/80 pt-4 flex flex-col gap-2">
-                  <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-1">법률 및 지원</span>
                   <Link
                     href="/terms"
                     onClick={() => setShowDrawer(false)}

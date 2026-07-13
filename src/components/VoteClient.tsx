@@ -816,8 +816,28 @@ export default function VoteClient({
                 {/* Notion Category Filter Section */}
                 <div className="border-t border-zinc-900/80 pt-4">
                   <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-3">카테고리 필터</span>
+                  
+                  {/* Option 1: 전체 (Top on its own row) */}
+                  <div className="mb-3">
+                    {categoriesConfig.filter(c => c.name === '전체').map((cat) => {
+                      const isActive = selectedCategories.includes(cat.name);
+                      return (
+                        <button
+                          key={cat.name}
+                          onClick={() => onToggleCategoryWrapper(cat.name)}
+                          className={`w-full px-3 py-2 rounded-full text-xs font-black border transition-all cursor-pointer text-center ${
+                            isActive ? cat.activeClass : cat.inactiveClass
+                          }`}
+                        >
+                          {cat.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Option 2: Remaining categories (Grid/Wrap below) */}
                   <div className="flex flex-wrap gap-2">
-                    {categoriesConfig.map((cat) => {
+                    {categoriesConfig.filter(c => c.name !== '전체').map((cat) => {
                       const isActive = selectedCategories.includes(cat.name);
                       return (
                         <button
@@ -839,7 +859,6 @@ export default function VoteClient({
 
                 {/* Additional Trust Links Inside Drawer */}
                 <div className="border-t border-zinc-900/80 pt-4 flex flex-col gap-2">
-                  <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block mb-1">법률 및 지원</span>
                   <Link
                     href="/terms"
                     onClick={() => setShowDrawer(false)}
