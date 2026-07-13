@@ -296,8 +296,8 @@ function LandingClient() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-[#080911] flex flex-col items-center justify-center space-y-4"
           >
-            <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
-            <p className="text-sm font-extrabold text-neutral-350 tracking-wider animate-pulse">딜레마 게임 로딩 중...</p>
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-t-transparent border-neutral-700" />
+            <p className="text-base font-semibold text-neutral-450">질문을 불러오고 있습니다...</p>
           </motion.div>
         )}
       </AnimatePresence>
